@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101916">
+    <title>Ultimate Player Tracker</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="Ultimate Player Tracker home">
+          <span class="brand-mark">UP</span>
+          <span class="brand-copy">
+            <strong>ULTIMATE</strong>
+            <span>PLAYER TRACKER</span>
+          </span>
+        </a>
+
+        <div class="sidebar-section">
+          <span class="eyebrow">WORKSPACE</span>
+          <div class="workspace-item active">
+            <span class="live-dot"></span>
+            <span>Live camera</span>
+          </div>
+        </div>
+
+        <div class="sidebar-note">
+          <span class="note-icon">i</span>
+          <p>Video is processed locally on this computer.</p>
+        </div>
+
+        <div class="sidebar-bottom">
+          <span class="status-indicator" id="sidebarIndicator"></span>
+          <span id="sidebarStatus">SYSTEM IDLE</span>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">TRACKING STUDIO</span>
+            <h1>Live session</h1>
+          </div>
+          <div class="session-chip">
+            <span class="live-dot" id="headerLiveDot"></span>
+            <span id="headerSessionText">READY TO CONNECT</span>
+          </div>
+        </header>
+
+        <section class="welcome-banner">
+          <div>
+            <span class="eyebrow">ULTIMATE FRISBEE · COMPUTER VISION</span>
+            <h2>See the play unfold.</h2>
+            <p>Track players live and inspect frisbee detections from your camera.</p>
+          </div>
+          <div class="banner-orbit" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="disc-shape"></div>
+            <span class="orbit-cross">+</span>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="Live tracking metrics">
+          <article class="metric-card">
+            <span class="metric-label">PROCESSING SPEED</span>
+            <div class="metric-value"><strong id="fpsValue">--</strong><span>FPS</span></div>
+            <span class="metric-foot">Inference performance</span>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">PLAYER TRACKS</span>
+            <div class="metric-value"><strong id="playersValue">0</strong><span>VISIBLE</span></div>
+            <span class="metric-foot">Person predictions confirmed over time</span>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">FRISBEE DETECTIONS</span>
+            <div class="metric-value"><strong id="frisbeeValue">0</strong><span>THIS FRAME</span></div>
+            <span class="metric-foot">Frisbee-class predictions only</span>
+          </article>
+          <article class="metric-card diagnostic-metric">
+            <span class="metric-label">WHITE OVAL CANDIDATES</span>
+            <div class="metric-value"><strong id="whiteOvalValue">0</strong><span>HEURISTIC</span></div>
+            <span class="metric-foot">Shape/color only; may be a false positive</span>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel video-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">CAMERA FEED</span>
+                <h2>Live preview</h2>
+              </div>
+              <span class="feed-badge" id="feedBadge"><span></span> OFFLINE</span>
+            </div>
+
+            <div class="video-stage" id="videoStage">
+              <video id="cameraVideo" autoplay muted playsinline></video>
+              <img id="processedFrame" alt="Live frame annotated with player tracks and frisbee predictions">
+              <div class="video-placeholder" id="videoPlaceholder">
+                <div class="camera-icon" aria-hidden="true">
+                  <svg viewBox="0 0 48 48" fill="none">
+                    <rect x="5" y="13" width="27" height="23" rx="4"></rect>
+                    <path d="m32 21 11-6v19l-11-6"></path>
+                    <circle cx="18.5" cy="24.5" r="5.5"></circle>
+                  </svg>
+                </div>
+                <strong>Your field view starts here</strong>
+                <span>Connect a camera to begin tracking</span>
+              </div>
+              <div class="frame-tag" id="frameTag"><span></span> LIVE ANALYSIS</div>
+              <div class="frame-overlay" aria-hidden="true">
+                <span>ULTIMATE TRACKER</span>
+                <span id="frameClock">LOCAL PROCESSING</span>
+              </div>
+            </div>
+            <div class="video-footer">
+              <div class="legend">
+                <span><i class="legend-player"></i> PLAYER TRACK</span>
+                <span><i class="legend-frisbee"></i> FRISBEE / OVAL CANDIDATE</span>
+              </div>
+              <span class="privacy-note"><span class="privacy-lock">◆</span> Stays on this device</span>
+            </div>
+          </article>
+
+          <aside class="panel controls-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">SESSION CONTROLS</span>
+                <h2>Setup</h2>
+              </div>
+              <span class="settings-icon" aria-hidden="true">⚙</span>
+            </div>
+
+            <label class="field-label" for="cameraSelect">CAMERA SOURCE</label>
+            <select id="cameraSelect">
+              <option value="">Default camera</option>
+            </select>
+
+            <label class="field-label" for="sizeSelect">INFERENCE SIZE</label>
+            <select id="sizeSelect">
+              <option value="416" selected>416 · Faster</option>
+              <option value="640">640 · Balanced</option>
+              <option value="960">960 · More detail</option>
+              <option value="1280">1280 · Highest detail</option>
+            </select>
+
+            <label class="field-label" for="personConfidence">PLAYER FILTER</label>
+            <select id="personConfidence">
+              <option value="0.25">Most detections · 0.25</option>
+              <option value="0.4" selected>Balanced · 0.40</option>
+              <option value="0.55">Fewer false detections · 0.55</option>
+            </select>
+            <span class="field-help">
+              Confirmed after 2 consecutive detections. Lower cutoff finds more.
+            </span>
+
+            <label class="field-label" for="deviceSelect">COMPUTE DEVICE</label>
+            <select id="deviceSelect">
+              <option value="cpu" selected>CPU</option>
+              <option value="auto">Auto detect</option>
+            </select>
+            <span class="field-help">CPU may process fewer frames per second.</span>
+
+            <div class="control-buttons">
+              <button class="button button-primary" id="startButton" type="button">
+                <span class="button-play">▶</span> Start tracking
+              </button>
+              <button class="button button-stop" id="stopButton" type="button" disabled>
+                Stop session
+              </button>
+            </div>
+
+            <div class="session-status">
+              <span class="status-indicator" id="statusIndicator"></span>
+              <div>
+                <strong id="statusTitle">Ready when you are</strong>
+                <span id="statusDescription">Choose a camera and start a session.</span>
+              </div>
+            </div>
+            <p class="model-note">
+              Orange boxes include model frisbee predictions and white oval shape candidates.
+              Shape candidates are not proof of a real frisbee; other white objects can match.
+            </p>
+          </aside>
+        </section>
+
+        <section class="panel analysis-panel" aria-labelledby="analysisTitle">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">PER-FRAME MODEL OUTPUT</span>
+              <h2 id="analysisTitle">Detection analysis</h2>
+            </div>
+            <span class="analysis-frame" id="analysisFrame">WAITING FOR CAMERA</span>
+          </div>
+          <div class="table-wrap">
+            <table class="analysis-table">
+              <thead>
+                <tr>
+                  <th>CLASS</th>
+                  <th>TRACK ID</th>
+                  <th>CONFIDENCE</th>
+                  <th>BOX · X1, Y1, X2, Y2</th>
+                  <th>RESULT</th>
+                </tr>
+              </thead>
+              <tbody id="analysisRows">
+                <tr class="empty-row">
+                  <td colspan="5">Start a session to view per-frame detections.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="analysis-note">
+            Player rows are model predictions confirmed over 2 consecutive frames at the selected
+            confidence. A “frisbee-like” row is only a white oval/circle shape heuristic; it can
+            also match bottles or other white objects. The heuristic skips candidates overlapping
+            a model person/frisbee/sports-ball box.
+          </p>
+        </section>
+
+        <footer class="page-footer">
+          <span>ULTIMATE PLAYER TRACKER <i>·</i> LOCAL WEB APP</span>
+          <span>MODEL <strong>YOLOv10s</strong> <i>·</i> DEEPSORT</span>
+        </footer>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>

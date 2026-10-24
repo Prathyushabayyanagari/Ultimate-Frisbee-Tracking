@@ -1,0 +1,24 @@
+__pycache__*
+yolov4.weights
+checkpoints*
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+# Generated output videos and diagnostics
+outputs/
+
+# Local backups
+backups/
+# Large local videos and model files
+data/video/*.mp4
+data/video/*.avi
+*.weights
+*.pb
+*.pt
+*.onnx
+*.tflite
